@@ -193,12 +193,15 @@ st.markdown("---")
 st.subheader("🔐 Administração")
 admin_user = st.text_input("Admin user:")
 admin_pass = st.text_input("Password:", type="password")
+
 if admin_user == "Ramon.Silva" and admin_pass == "PAGOLD672":
     df = carregar_ranking()
     st.dataframe(df)
-    if st.button("🗑️ Zerar Ranking"):
+
+    if st.button("🗑️ Zerar Ranking", key="botao_zerar_ranking"):
         zerar_ranking()
         st.success("✅ Ranking zerado com sucesso.")
+
 
 
 
