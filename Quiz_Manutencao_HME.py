@@ -9,7 +9,7 @@ import os
 st.set_page_config(page_title="Quiz Técnico HME", layout="wide")
 
 # Exibe logo
-#st.image("LOGO PA.png", width=200)  # Substitua pelo nome do seu arquivo de logo
+st.image("logo_empresa.png", width=200)  # Substitua pelo nome do seu arquivo de logo
 
 # Caminho fixo para o ranking
 RANKING_FILE = os.path.join(os.path.dirname(__file__), "ranking.csv")
@@ -116,8 +116,8 @@ if nome_usuario and registro_interno:
             pontuacao = sum(
                 1
                 for bloco in quiz_data
-                for i, p in enumerate(bloco["perguntas"])
-                if st.session_state["respostas"].get(f"{bloco['equipamento']}_{i}") == p["alternativas"][p["correta"]]
+                for i, pergunta_obj in enumerate(bloco["perguntas"])
+                if st.session_state["respostas"].get(f"{bloco['equipamento']}_{i}") == pergunta_obj["alternativas"][pergunta_obj["correta"]]
             )
             porcentagem = (pontuacao / total_perguntas * 100) if total_perguntas else 0
 
@@ -167,5 +167,4 @@ if admin_user == "admin" and admin_pass == "senha123":
     st.dataframe(df)
 else:
     st.info("Login admin para visualizar ranking.")
-
 
