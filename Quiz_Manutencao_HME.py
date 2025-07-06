@@ -36,7 +36,7 @@ st.subheader("🧑‍🔧 Identificação do Colaborador")
 
 nome_usuario = st.text_input("Nome completo:")
 registro_interno = st.text_input("Registro interno (código único):")
-turno = st.selectbox("Turno:", ["Manhã", "Tarde", "Noite"])
+Letra = st.selectbox("Letra:", ["ADM", "A", "B", "C", "D"])
 setor = st.text_input("Setor:")
 equipamento_foco = st.selectbox(
     "Equipamento de atuação principal:",
