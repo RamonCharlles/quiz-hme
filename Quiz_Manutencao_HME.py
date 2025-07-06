@@ -144,7 +144,7 @@ st.subheader("🔒 Acesso Administrativo")
 admin_user = st.text_input("Usuário administrador:")
 admin_pass = st.text_input("Senha:", type="password")
 
-if admin_user == "admin" and admin_pass == "senha123":
+if admin_user == "Ramon.Silva" and admin_pass == "Anna47554":
     st.success("Acesso concedido ao ranking completo.")
     st.subheader("🏆 Ranking dos 5 Melhores")
     top5 = ranking_df.sort_values(by="Porcentagem", ascending=False).head(5)
