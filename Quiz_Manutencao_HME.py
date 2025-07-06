@@ -9,7 +9,7 @@ import os
 st.set_page_config(page_title="Quiz Técnico HME", layout="wide")
 
 # Exibe logo
-st.image("logo_empresa.png", width=200)  # Substitua pelo nome do seu arquivo de logo
+#st.image("LOGO PA.png", width=200)  # Substitua pelo nome do seu arquivo de logo
 
 # Caminho fixo para o ranking
 RANKING_FILE = os.path.join(os.path.dirname(__file__), "ranking.csv")
@@ -167,4 +167,5 @@ if admin_user == "admin" and admin_pass == "senha123":
     st.dataframe(df)
 else:
     st.info("Login admin para visualizar ranking.")
+
 
