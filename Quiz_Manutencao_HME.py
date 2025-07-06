@@ -27,7 +27,7 @@ def salvar_ranking(df):
     df.to_csv(RANKING_FILE, index=False)
 
 def zerar_ranking():
-    salvar_ranking(pd.DataFrame(columns=["Registro", "Nome", "Letra", "Setor", "Equipamento", "Pontuação", "Porcentagem", "Data"]))
+    salvar_ranking(pd.DataFrame(columns=["Registro", "Nome", "Turno", "Setor", "Equipamento", "Pontuação", "Porcentagem", "Data"]))
 
 # --- Identificação do colaborador ---
 st.title("📊 Quiz Técnico de Manutenção - Frota HME")
@@ -37,7 +37,7 @@ st.subheader("🧑‍🔧 Identificação do Colaborador")
 nome_usuario = st.text_input("Nome completo:")
 registro_interno = st.text_input("Registro interno (código único):")
 turno = st.selectbox("Turno:", ["Dia", "Noite", "Revezamento", "ADM"])
-Letra = st.selectbox("Letra:", ["ADM", "A", "B", "C", "D"])
+letra = st.selectbox("Letra:", ["ADM", "A", "B", "C", "D"])
 setor = st.selectbox("Setor:", [
     "Mecânico HME", "Elétrico HME", "BORRACHARIA",
     "CAUDEIRARIA", "AUXILIAR TÉCNICO HME", "OUTROS"
@@ -59,7 +59,7 @@ registro_existente = registro_hash in ranking_df["Registro"].values
 
 if nome_usuario and registro_interno and not registro_existente:
 
-    # --- Dados do Quiz ---
+    # --- Quiz com perguntas técnicas ---
     quiz_data = [
         {
             "equipamento": "LHD ST1030",
@@ -113,6 +113,16 @@ if nome_usuario and registro_interno and not registro_existente:
         },
     ]
 
+    # Embaralha alternativas na primeira vez
+    if "embaralhadas" not in st.session_state:
+        st.session_state["embaralhadas"] = {}
+        for bloco in quiz_data:
+            for i, pergunta in enumerate(bloco["perguntas"]):
+                key = f"{bloco['equipamento']}_{i}"
+                alternativas = pergunta["alternativas"].copy()
+                random.shuffle(alternativas)
+                st.session_state["embaralhadas"][key] = alternativas
+
     if "respostas" not in st.session_state:
         st.session_state["respostas"] = {}
 
@@ -122,17 +132,21 @@ if nome_usuario and registro_interno and not registro_existente:
         for i, pergunta in enumerate(bloco["perguntas"]):
             total_perguntas += 1
             key = f"{bloco['equipamento']}_{i}"
+            alternativas = st.session_state["embaralhadas"][key]
             with st.expander(f"🔧 {pergunta['pergunta']}", expanded=False):
-                resposta = st.radio("Escolha:", pergunta["alternativas"], key=key)
+                resposta = st.radio("Escolha:", alternativas, key=key, index=None)
                 st.session_state["respostas"][key] = resposta
 
     if st.button("🚀 Enviar Quiz"):
-        pontuacao = sum(
-            1
-            for bloco in quiz_data
-            for i, pergunta_obj in enumerate(bloco["perguntas"])
-            if st.session_state["respostas"].get(f"{bloco['equipamento']}_{i}") == pergunta_obj["alternativas"][pergunta_obj["correta"]]
-        )
+        pontuacao = 0
+        for bloco in quiz_data:
+            for i, pergunta in enumerate(bloco["perguntas"]):
+                key = f"{bloco['equipamento']}_{i}"
+                resposta_usuario = st.session_state["respostas"].get(key)
+                alternativa_correta = pergunta["alternativas"][pergunta["correta"]]
+                if resposta_usuario == alternativa_correta:
+                    pontuacao += 1
+
         porcentagem = (pontuacao / total_perguntas * 100) if total_perguntas else 0
 
         st.markdown("---")
@@ -150,9 +164,9 @@ if nome_usuario and registro_interno and not registro_existente:
         else:
             st.error("❌ Baixo desempenho. Reforço técnico recomendado.")
 
-        # Atualiza ranking
+        # Salva no ranking
         df_atual = carregar_ranking()
-        nova_linha_df = pd.DataFrame([{  
+        nova_linha_df = pd.DataFrame([{
             "Registro": registro_hash,
             "Nome": nome_usuario,
             "Turno": turno,
@@ -165,14 +179,14 @@ if nome_usuario and registro_interno and not registro_existente:
         ranking_df = pd.concat([df_atual, nova_linha_df], ignore_index=True)
         salvar_ranking(ranking_df)
 
-        # Exibe ranking top 5
+        # Exibe top 5
         st.markdown("---")
         st.subheader("🏅 Ranking dos 5 Melhores")
         top5 = ranking_df.sort_values(by="Porcentagem", ascending=False).head(5)
         st.table(top5[["Nome", "Setor", "Pontuação", "Porcentagem", "Data"]])
 
 elif nome_usuario and registro_existente:
-    st.error("⚠️ Registro duplicado detectado. Quiz já respondido com esses dados.")
+    st.error("⚠️ Registro duplicado detectado. Quiz já foi respondido com esses dados.")
 
 # --- Administração ---
 st.markdown("---")
@@ -184,7 +198,8 @@ if admin_user == "Ramon.Silva" and admin_pass == "PAGOLD672":
     st.dataframe(df)
     if st.button("🗑️ Zerar Ranking"):
         zerar_ranking()
-        st.success("Ranking zerado com sucesso.")
+        st.success("✅ Ranking zerado com sucesso.")
+
 
 
     if st.button("🗑️ Zerar Ranking"):
