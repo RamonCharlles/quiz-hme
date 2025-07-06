@@ -27,7 +27,7 @@ def salvar_ranking(df):
     df.to_csv(RANKING_FILE, index=False)
 
 def zerar_ranking():
-    salvar_ranking(pd.DataFrame(columns=["Registro", "Nome", "Turno", "Setor", "Equipamento", "Pontuação", "Porcentagem", "Data"]))
+    salvar_ranking(pd.DataFrame(columns=["Registro", "Nome", "Letra", "Setor", "Equipamento", "Pontuação", "Porcentagem", "Data"]))
 
 # --- Identificação do colaborador ---
 st.title("📊 Quiz Técnico de Manutenção - Frota HME")
@@ -36,8 +36,8 @@ st.subheader("🧑‍🔧 Identificação do Colaborador")
 
 nome_usuario = st.text_input("Nome completo:")
 registro_interno = st.text_input("Registro interno (código único):")
-turno = st.selectbox("Turno:", ["Manhã", "Tarde", "Noite"])
-setor = st.text_input("Setor:")
+Letra = st.selectbox("Letra:", ["ADM", "A", "B", "C", "D"])
+setor = st.selectbox("Setor:", ["Mecânico HME", "Elétrico HME", "BORRACHARIA", "CAUDEIRARIA", "AUXILIAR TÉCNICO HME", "OUTROS"])
 equipamento_foco = st.selectbox(
     "Equipamento de atuação principal:",
     ["LHD ST1030", "Jumbo Boomer S2", "Simbas S7", "Volvo VM360", "Caterpillar 416", "Constellation", "Volvo L120", "JCB 540-170", "Guindaste"]
@@ -48,10 +48,14 @@ registro_hash = hashlib.sha256((nome_usuario + registro_interno).encode()).hexdi
 ranking_df = carregar_ranking()
 registro_existente = registro_hash in ranking_df["Registro"].values
 
-if nome_usuario and registro_interno:
-    if registro_existente:
-        st.error("⚠️ Registro duplicado detectado. Quiz já respondido com esses dados.")
-    else:
+if registro_interno and not registro_interno.isdigit():
+    st.error("❌ Por favor, insira apenas números no registro interno.")
+else:
+    if nome_usuario and registro_interno:
+        # Aqui você verifica se já existe no ranking/planilha/etc
+        if registro_existente:  # Supondo que essa variável já foi definida com base em sua lógica
+            st.error("⚠️ Registro duplicado detectado. Quiz já respondido com esses dados.")
+        else:
         quiz_data = [
             {
                 "equipamento": "LHD ST1030",
@@ -168,7 +172,7 @@ st.markdown("---")
 st.subheader("🔐 Administração")
 admin_user = st.text_input("Admin user:")
 admin_pass = st.text_input("Password:", type="password")
-if admin_user == "admin" and admin_pass == "senha123":
+if admin_user == "Ramon.Silva" and admin_pass == "PAGOLD672":
     df = carregar_ranking()
     st.dataframe(df)
 
