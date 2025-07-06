@@ -8,8 +8,11 @@ import os
 # --- Configurações iniciais ---
 st.set_page_config(page_title="Quiz Técnico HME", layout="wide")
 
-# Exibe logo
-st.image("logo_empresa.png", width=200)  # Substitua pelo nome do seu arquivo de logo
+# Exibe logo com proteção
+try:
+    st.image("logo_empresa.png", width=200)
+except Exception:
+    st.warning("⚠️ Logo não encontrada. Verifique se o arquivo 'logo_empresa.png' está na pasta correta.")
 
 # Caminho fixo para o ranking
 RANKING_FILE = os.path.join(os.path.dirname(__file__), "ranking.csv")
@@ -22,6 +25,9 @@ def carregar_ranking():
 
 def salvar_ranking(df):
     df.to_csv(RANKING_FILE, index=False)
+
+def zerar_ranking():
+    salvar_ranking(pd.DataFrame(columns=["Registro", "Nome", "Turno", "Setor", "Equipamento", "Pontuação", "Porcentagem", "Data"]))
 
 # --- Identificação do colaborador ---
 st.title("📊 Quiz Técnico de Manutenção - Frota HME")
@@ -165,6 +171,9 @@ admin_pass = st.text_input("Password:", type="password")
 if admin_user == "admin" and admin_pass == "senha123":
     df = carregar_ranking()
     st.dataframe(df)
+
+    if st.button("🗑️ Zerar Ranking"):
+        zerar_ranking()
+        st.success("Ranking zerado com sucesso!")
 else:
     st.info("Login admin para visualizar ranking.")
-
