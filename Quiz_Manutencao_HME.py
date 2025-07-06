@@ -168,7 +168,7 @@ st.markdown("---")
 st.subheader("🔐 Administração")
 admin_user = st.text_input("Admin user:")
 admin_pass = st.text_input("Password:", type="password")
-if admin_user == "admin" and admin_pass == "senha123":
+if admin_user == "Ramon.Silva" and admin_pass == "PAGOLD672":
     df = carregar_ranking()
     st.dataframe(df)
 
